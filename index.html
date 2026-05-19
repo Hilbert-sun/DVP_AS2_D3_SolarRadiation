@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>When Sunshine Meets Rain: King's Park Solar Radiation</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-content">
+        <h1>
+          When Sunshine Meets Rain: Understanding Solar Radiation Patterns at
+          King's Park, Hong Kong
+        </h1>
+        <p>
+          An interactive narrative for urban planners and environmental policy
+          advisors.
+        </p>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <nav class="story-nav" aria-label="Story steps">
+        <h2>Story Steps</h2>
+        <ol class="story-steps">
+          <li>
+            <button type="button" data-step="1">
+              1. Long-term climate context
+            </button>
+          </li>
+          <li>
+            <button type="button" data-step="2">2. Seasonal rhythm</button>
+          </li>
+          <li>
+            <button type="button" data-step="3">
+              3. Sunshine as the main driver
+            </button>
+          </li>
+          <li>
+            <button type="button" data-step="4">
+              4. Extreme solar radiation days
+            </button>
+          </li>
+          <li>
+            <button type="button" data-step="5">5. Planning takeaway</button>
+          </li>
+        </ol>
+      </nav>
+
+      <main class="main-panel">
+        <section class="chart-area" id="chart-area" aria-label="Main chart area">
+          <div class="chart-placeholder">Chart will render here.</div>
+        </section>
+        <aside class="insight-panel" id="insight-panel" aria-label="Insight panel">
+          <h2>Insight Panel</h2>
+          <p>Key narrative insights will appear here.</p>
+        </aside>
+      </main>
+    </div>
+
+    <section class="control-bar" id="control-bar" aria-label="Control bar">
+      <div class="control-group">
+        <label>Year range</label>
+        <div class="year-inputs">
+          <input
+            id="start-year-input"
+            type="number"
+            min="1992"
+            max="2025"
+            value="1992"
+            placeholder="Start"
+            aria-label="Start year"
+          />
+          <span class="year-separator">–</span>
+          <input
+            id="end-year-input"
+            type="number"
+            min="1992"
+            max="2025"
+            value="2025"
+            placeholder="End"
+            aria-label="End year"
+          />
+        </div>
+        <div id="year-warning" class="year-warning" style="display: none;"></div>
+      </div>
+      <div class="control-group">
+        <label for="season-filter">Season</label>
+        <select id="season-filter">
+          <option value="all">All seasons</option>
+          <option value="winter">Winter</option>
+          <option value="spring">Spring</option>
+          <option value="summer">Summer</option>
+          <option value="autumn">Autumn</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="extreme-toggle">Extreme days</label>
+        <input id="extreme-toggle" type="checkbox" />
+      </div>
+      <div class="control-group">
+        <button id="reset-filters" type="button">Reset</button>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>
+        Data source: Hong Kong Observatory daily climate observations at King's
+        Park.
+      </p>
+    </footer>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
