@@ -17,6 +17,7 @@ const state = {
   endYear: null,
   selectedSeason: "all",
   showExtremeOnly: false,
+  selectedExtremeDate: null,
 };
 
 let rawData = [];
@@ -82,10 +83,23 @@ function updateStepButtons() {
 function getFilteredData() {
   let filtered = filterByYearRange(rawData, state.startYear, state.endYear);
   filtered = filterBySeason(filtered, state.selectedSeason);
-  const withExtreme = markExtremeDays(filtered);
-  return state.showExtremeOnly
-    ? withExtreme.filter((row) => row.isExtreme)
-    : withExtreme;
+  return markExtremeDays(filtered);
+}
+
+function handleExtremeDaySelect(dateKey) {
+  if (!dateKey) {
+    return;
+  }
+
+  updateState({
+    currentStep: 3,
+    selectedExtremeDate: dateKey,
+    showExtremeOnly: true,
+  });
+
+  if (extremeToggle) {
+    extremeToggle.checked = true;
+  }
 }
 
 function renderCurrentStep() {
@@ -106,7 +120,10 @@ function renderCurrentStep() {
       renderScatterDriver(chartArea, data, state, insightPanel);
       break;
     case 4:
-      renderExtremeDays(chartArea, data, state, insightPanel);
+      renderExtremeDays(chartArea, data, {
+        ...state,
+        onSelectExtremeDay: handleExtremeDaySelect,
+      });
       break;
     case 5:
       renderPlaceholder("Planning takeaway", "Narrative cards coming soon.");
@@ -133,6 +150,7 @@ function handleReset() {
   state.endYear = maxYear;
   state.selectedSeason = "all";
   state.showExtremeOnly = false;
+  state.selectedExtremeDate = null;
 
   if (startYearInput) {
     startYearInput.value = minYear;
@@ -211,7 +229,10 @@ function attachEventListeners() {
 
   if (extremeToggle) {
     extremeToggle.addEventListener("change", (event) => {
-      updateState({ showExtremeOnly: event.target.checked });
+      updateState({
+        showExtremeOnly: event.target.checked,
+        selectedExtremeDate: event.target.checked ? state.selectedExtremeDate : null,
+      });
     });
   }
 

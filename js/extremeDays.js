@@ -63,7 +63,14 @@ function renderSummaryCards(container, summary) {
   container.appendChild(cards);
 }
 
-function renderTopTable(container, rows, d3) {
+function getDateKey(row, d3) {
+  if (row?.date instanceof Date) {
+    return d3.timeFormat("%Y-%m-%d")(row.date);
+  }
+  return row?.date ? String(row.date).slice(0, 10) : "";
+}
+
+function renderTopTable(container, rows, d3, onSelectExtremeDay) {
   const table = document.createElement("table");
   table.className = "extreme-table";
 
@@ -86,8 +93,7 @@ function renderTopTable(container, rows, d3) {
     if (index % 2 === 0) {
       tr.classList.add("zebra-row");
     }
-    const dateLabel =
-      row.date instanceof Date ? timeFormat(row.date) : row.date || "Unknown";
+    const dateLabel = getDateKey(row, d3) || "Unknown";
 
     const cells = [
       dateLabel,
@@ -100,7 +106,20 @@ function renderTopTable(container, rows, d3) {
 
     cells.forEach((value, colIndex) => {
       const td = document.createElement("td");
-      td.textContent = value;
+      if (colIndex === 0 && typeof onSelectExtremeDay === "function") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "date-link";
+        button.textContent = value;
+        button.setAttribute(
+          "aria-label",
+          `Highlight ${value} in the sunshine driver scatterplot`
+        );
+        button.addEventListener("click", () => onSelectExtremeDay(dateLabel));
+        td.appendChild(button);
+      } else {
+        td.textContent = value;
+      }
       if (colIndex > 1) {
         td.className = "numeric";
       }
@@ -240,11 +259,17 @@ export function renderExtremeDays(containerSelector, data, state) {
     tableTitle.textContent = "Top 10 extreme days";
     container.appendChild(tableTitle);
 
+    const tableHint = document.createElement("p");
+    tableHint.className = "interaction-hint";
+    tableHint.textContent =
+      "Click a date to trace that extreme event in the sunshine-GSR scatterplot.";
+    container.appendChild(tableHint);
+
     const topDays = [...extremeDays]
       .sort((a, b) => b.GSR - a.GSR)
       .slice(0, 10);
 
-    renderTopTable(container, topDays, d3);
+    renderTopTable(container, topDays, d3, state?.onSelectExtremeDay);
   } catch (error) {
     console.error("Failed to render extreme days view:", error);
     container.textContent = "Unable to render extreme day details.";

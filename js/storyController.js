@@ -29,15 +29,14 @@ export function getInsightText(step) {
     case 3:
       return (
         "Sunshine duration emerges as the strongest predictor of solar radiation in daily data. " +
-        "Environmental policy advisors can prioritize sunshine availability as a primary screening " +
-        "criterion when siting new solar arrays, simplifying early-stage feasibility assessments."
+        "The extreme-day highlight keeps rare high-radiation events visible inside the full daily " +
+        "context, helping policy advisors compare peak opportunities with normal operating conditions."
       );
     case 4:
       return (
         "The top 5% solar radiation days concentrate in specific seasons and carry distinct " +
-        "weather signatures combining low humidity and high sunshine. Understanding when extreme " +
-        "radiation peaks occur helps planners design systems that exploit peak periods and prepare " +
-        "for network stress during concentration events."
+        "weather signatures combining low humidity and high sunshine. Click any top-10 date to trace " +
+        "that individual event back to the multivariate scatterplot and inspect why it stands out."
       );
     case 5:
       return (

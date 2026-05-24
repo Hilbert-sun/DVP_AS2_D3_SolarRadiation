@@ -54,12 +54,13 @@ Show three takeaway cards for planners.
 - Click story step buttons.
 - Select year range.
 - Select season.
-- Toggle extreme solar days.
+- Toggle extreme solar day highlighting.
+- Click a top-10 extreme day to trace that record in the SUN-GSR scatterplot.
 - Hover for tooltip.
 - Reset all filters.
 
 ## Technical stack
-- D3.js v7
+- D3.js v7, loaded from the submitted local `js/lib/d3.v7.min.js` file
 - HTML
 - CSS
 - Vanilla JavaScript

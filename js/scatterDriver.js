@@ -22,6 +22,13 @@ function normalizeSeason(value) {
   return String(value).trim().toLowerCase();
 }
 
+function getDateKey(row, d3) {
+  if (row?.date instanceof Date) {
+    return d3.timeFormat("%Y-%m-%d")(row.date);
+  }
+  return row?.date ? String(row.date).slice(0, 10) : "";
+}
+
 export function renderScatterDriver(containerSelector, data, state) {
   const d3 = requireD3();
   const container = resolveContainer(containerSelector);
@@ -71,6 +78,24 @@ export function renderScatterDriver(containerSelector, data, state) {
       .attr("font-size", 20)
       .attr("font-weight", 600)
       .text("Sunshine as the main driver of solar radiation");
+
+    const selectedRow = state?.selectedExtremeDate
+      ? filtered.find((row) => getDateKey(row, d3) === state.selectedExtremeDate)
+      : null;
+
+    if (state?.showExtremeOnly) {
+      svg
+        .append("text")
+        .attr("x", margin.left)
+        .attr("y", 56)
+        .attr("font-size", 13)
+        .attr("fill", "#5b6670")
+        .text(
+          selectedRow
+            ? `Linked from Step 4: ${state.selectedExtremeDate} is highlighted against the full daily context.`
+            : "Extreme solar radiation days are highlighted while the full daily context remains visible."
+        );
+    }
 
     const chart = svg
       .append("g")
@@ -150,11 +175,26 @@ export function renderScatterDriver(containerSelector, data, state) {
       .attr("cy", (d) => yScale(d.GSR))
       .attr("r", (d) => sizeScale(d.RF))
       .attr("fill", (d) => colorScale(d.RH))
-      .attr("fill-opacity", 0.75)
+      .attr("fill-opacity", (d) => {
+        if (!state?.showExtremeOnly) {
+          return 0.72;
+        }
+        return d.isExtreme ? 0.88 : 0.18;
+      })
       .attr("stroke", (d) =>
-        state?.showExtremeOnly && d.isExtreme ? "#1f2933" : "none"
+        getDateKey(d, d3) === state?.selectedExtremeDate
+          ? "#d26a2e"
+          : state?.showExtremeOnly && d.isExtreme
+            ? "#1f2933"
+            : "none"
       )
-      .attr("stroke-width", (d) => (state?.showExtremeOnly && d.isExtreme ? 1.5 : 0))
+      .attr("stroke-width", (d) =>
+        getDateKey(d, d3) === state?.selectedExtremeDate
+          ? 3
+          : state?.showExtremeOnly && d.isExtreme
+            ? 1.1
+            : 0
+      )
       .on("mousemove", (event, d) => {
         const dateLabel = d.date instanceof Date ? timeFormat(d.date) : d.date || "Unknown date";
         tooltip
@@ -172,6 +212,55 @@ export function renderScatterDriver(containerSelector, data, state) {
       .on("mouseleave", () => {
         tooltip.style("opacity", 0);
       });
+
+    if (selectedRow) {
+      const selectedX = xScale(selectedRow.SUN);
+      const selectedY = yScale(selectedRow.GSR);
+
+      chart
+        .append("circle")
+        .attr("cx", selectedX)
+        .attr("cy", selectedY)
+        .attr("r", Math.max(18, sizeScale(selectedRow.RF) + 8))
+        .attr("fill", "none")
+        .attr("stroke", "#d26a2e")
+        .attr("stroke-width", 2.5)
+        .attr("stroke-dasharray", "5,4")
+        .attr("pointer-events", "none");
+
+      chart
+        .append("line")
+        .attr("x1", selectedX)
+        .attr("x2", selectedX)
+        .attr("y1", selectedY)
+        .attr("y2", innerHeight)
+        .attr("stroke", "#d26a2e")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "4,4")
+        .attr("pointer-events", "none");
+
+      chart
+        .append("line")
+        .attr("x1", 0)
+        .attr("x2", selectedX)
+        .attr("y1", selectedY)
+        .attr("y2", selectedY)
+        .attr("stroke", "#d26a2e")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "4,4")
+        .attr("pointer-events", "none");
+
+      const labelX = Math.min(selectedX + 16, innerWidth - 170);
+      const labelY = Math.max(selectedY - 26, 24);
+      chart
+        .append("text")
+        .attr("x", labelX)
+        .attr("y", labelY)
+        .attr("font-size", 12)
+        .attr("font-weight", 600)
+        .attr("fill", "#d26a2e")
+        .text(`Selected extreme day: ${state.selectedExtremeDate}`);
+    }
 
     const legendGroup = chart
       .append("g")

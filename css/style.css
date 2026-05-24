@@ -390,6 +390,31 @@ button {
   transition: background 0.15s ease;
 }
 
+.date-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.date-link:hover,
+.date-link:focus-visible {
+  color: #d26a2e;
+  outline: none;
+}
+
+.interaction-hint {
+  margin: -0.25rem 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 @media (max-width: 640px) {
   .extreme-table {
     font-size: 0.85rem;
