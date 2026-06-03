@@ -153,7 +153,7 @@ export function renderScatterDriver(containerSelector, data, state) {
       .select(container)
       .append("div")
       .attr("class", "chart-tooltip")
-      .style("position", "fixed")
+      .style("position", "absolute")
       .style("opacity", 0)
       .style("pointer-events", "none")
       .style("background", "#ffffff")
@@ -212,23 +212,25 @@ export function renderScatterDriver(containerSelector, data, state) {
         const tooltipHeight = tooltipNode.offsetHeight;
         const containerRect = container.getBoundingClientRect();
         const padding = 12;
+        const pointerX = event.clientX - containerRect.left;
+        const pointerY = event.clientY - containerRect.top;
 
-        let left = event.clientX + padding;
-        let top = event.clientY - tooltipHeight / 2;
+        let left = pointerX + padding;
+        let top = pointerY - tooltipHeight / 2;
 
-        if (left + tooltipWidth + padding > containerRect.right) {
-          left = event.clientX - tooltipWidth - padding;
+        if (left + tooltipWidth + padding > container.clientWidth) {
+          left = pointerX - tooltipWidth - padding;
         }
-        if (top < containerRect.top + padding) {
-          top = containerRect.top + padding;
+        if (top < padding) {
+          top = padding;
         }
-        if (top + tooltipHeight + padding > containerRect.bottom) {
-          top = containerRect.bottom - tooltipHeight - padding;
+        if (top + tooltipHeight + padding > container.clientHeight) {
+          top = container.clientHeight - tooltipHeight - padding;
         }
 
         left = Math.max(
-          containerRect.left + padding,
-          Math.min(left, containerRect.right - tooltipWidth - padding)
+          padding,
+          Math.min(left, container.clientWidth - tooltipWidth - padding)
         );
 
         tooltip.style("left", `${left}px`).style("top", `${top}px`);

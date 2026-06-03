@@ -254,7 +254,7 @@ async function loadChartModules() {
     };
 
   try {
-    const module = await import("./annualTrend.js");
+    const module = await import("./annualTrend.js?v=20260603-tooltip-fix");
     renderAnnualTrend = module.renderAnnualTrend || fallback("Annual trend");
   } catch (error) {
     console.warn("annualTrend.js not available yet.", error);
@@ -262,7 +262,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./seasonalPattern.js");
+    const module = await import("./seasonalPattern.js?v=20260603-tooltip-fix");
     renderSeasonalPattern =
       module.renderSeasonalPattern || fallback("Seasonal pattern");
   } catch (error) {
@@ -271,7 +271,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./scatterDriver.js");
+    const module = await import("./scatterDriver.js?v=20260603-tooltip-fix");
     renderScatterDriver =
       module.renderScatterDriver || fallback("Sunshine driver");
   } catch (error) {
@@ -280,7 +280,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./extremeDays.js");
+    const module = await import("./extremeDays.js?v=20260603-tooltip-fix");
     renderExtremeDays = module.renderExtremeDays || fallback("Extreme days");
   } catch (error) {
     console.warn("extremeDays.js not available yet.", error);
@@ -288,7 +288,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./storyController.js");
+    const module = await import("./storyController.js?v=20260603-tooltip-fix");
     updateStoryStep = module.updateStoryStep || module.renderStoryStep || null;
   } catch (error) {
     console.warn("storyController.js not available yet.", error);

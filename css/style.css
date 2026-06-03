@@ -136,6 +136,7 @@ p {
   min-height: 520px;
   padding: 1.5rem;
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .chart-placeholder {
