@@ -153,7 +153,7 @@ export function renderScatterDriver(containerSelector, data, state) {
       .select(container)
       .append("div")
       .attr("class", "chart-tooltip")
-      .style("position", "absolute")
+      .style("position", "fixed")
       .style("opacity", 0)
       .style("pointer-events", "none")
       .style("background", "#ffffff")
@@ -207,30 +207,28 @@ export function renderScatterDriver(containerSelector, data, state) {
             )}<br/>RF: ${d3.format(".2f")(d.RF)}<br/>RH: ${d3.format(".2f")(d.RH)}`
           );
 
-        const [containerX, containerY] = d3.pointer(event, container);
         const tooltipNode = tooltip.node();
         const tooltipWidth = tooltipNode.offsetWidth;
         const tooltipHeight = tooltipNode.offsetHeight;
-        const availableWidth = container.clientWidth;
-        const availableHeight = container.clientHeight;
+        const containerRect = container.getBoundingClientRect();
         const padding = 12;
 
-        let left = containerX + padding;
-        let top = containerY - tooltipHeight / 2;
+        let left = event.clientX + padding;
+        let top = event.clientY - tooltipHeight / 2;
 
-        if (left + tooltipWidth + padding > availableWidth) {
-          left = containerX - tooltipWidth - padding;
+        if (left + tooltipWidth + padding > containerRect.right) {
+          left = event.clientX - tooltipWidth - padding;
         }
-        if (top < padding) {
-          top = padding;
+        if (top < containerRect.top + padding) {
+          top = containerRect.top + padding;
         }
-        if (top + tooltipHeight + padding > availableHeight) {
-          top = availableHeight - tooltipHeight - padding;
+        if (top + tooltipHeight + padding > containerRect.bottom) {
+          top = containerRect.bottom - tooltipHeight - padding;
         }
 
         left = Math.max(
-          padding,
-          Math.min(left, availableWidth - tooltipWidth - padding)
+          containerRect.left + padding,
+          Math.min(left, containerRect.right - tooltipWidth - padding)
         );
 
         tooltip.style("left", `${left}px`).style("top", `${top}px`);
