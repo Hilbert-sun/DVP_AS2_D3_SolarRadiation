@@ -290,15 +290,37 @@ export function renderSeasonalPattern(containerSelector, data, state) {
 
         tooltip
           .style("opacity", 1)
-          .style("left", `${xScale(nearestMonth) + margin.left + 12}px`)
-          .style("top", `${
-            yScale(standardize(row.gsrAvg, seriesStats.get("gsrAvg"))) +
-            margin.top -
-            10
-          }px`)
           .html(
             `<strong>${MONTH_LABELS[nearestMonth - 1]}</strong><br/>${details}`
           );
+
+        const [containerX, containerY] = d3.pointer(event, container);
+        const tooltipNode = tooltip.node();
+        const tooltipWidth = tooltipNode.offsetWidth;
+        const tooltipHeight = tooltipNode.offsetHeight;
+        const availableWidth = container.clientWidth;
+        const availableHeight = container.clientHeight;
+        const padding = 12;
+
+        let left = containerX + padding;
+        let top = containerY - tooltipHeight / 2;
+
+        if (left + tooltipWidth + padding > availableWidth) {
+          left = containerX - tooltipWidth - padding;
+        }
+        if (top < padding) {
+          top = padding;
+        }
+        if (top + tooltipHeight + padding > availableHeight) {
+          top = availableHeight - tooltipHeight - padding;
+        }
+
+        left = Math.max(
+          padding,
+          Math.min(left, availableWidth - tooltipWidth - padding)
+        );
+
+        tooltip.style("left", `${left}px`).style("top", `${top}px`);
       })
       .on("mouseleave", () => {
         focusGroup.style("opacity", 0);

@@ -199,8 +199,6 @@ export function renderScatterDriver(containerSelector, data, state) {
         const dateLabel = d.date instanceof Date ? timeFormat(d.date) : d.date || "Unknown date";
         tooltip
           .style("opacity", 1)
-          .style("left", `${event.offsetX + 16}px`)
-          .style("top", `${event.offsetY - 12}px`)
           .html(
             `<strong>${dateLabel}</strong><br/>Season: ${
               d.season || "Unknown"
@@ -208,6 +206,34 @@ export function renderScatterDriver(containerSelector, data, state) {
               d.SUN
             )}<br/>RF: ${d3.format(".2f")(d.RF)}<br/>RH: ${d3.format(".2f")(d.RH)}`
           );
+
+        const [containerX, containerY] = d3.pointer(event, container);
+        const tooltipNode = tooltip.node();
+        const tooltipWidth = tooltipNode.offsetWidth;
+        const tooltipHeight = tooltipNode.offsetHeight;
+        const availableWidth = container.clientWidth;
+        const availableHeight = container.clientHeight;
+        const padding = 12;
+
+        let left = containerX + padding;
+        let top = containerY - tooltipHeight / 2;
+
+        if (left + tooltipWidth + padding > availableWidth) {
+          left = containerX - tooltipWidth - padding;
+        }
+        if (top < padding) {
+          top = padding;
+        }
+        if (top + tooltipHeight + padding > availableHeight) {
+          top = availableHeight - tooltipHeight - padding;
+        }
+
+        left = Math.max(
+          padding,
+          Math.min(left, availableWidth - tooltipWidth - padding)
+        );
+
+        tooltip.style("left", `${left}px`).style("top", `${top}px`);
       })
       .on("mouseleave", () => {
         tooltip.style("opacity", 0);
