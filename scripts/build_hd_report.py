@@ -22,9 +22,9 @@ from reportlab.platypus import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BODY_PDF = ROOT / "SUNZHEN_36446874_DVP_Report_HD_body.pdf"
-FINAL_PDF = ROOT / "SUNZHEN_36446874_DVP_Report_HD.pdf"
-FDS_PDF = ROOT / "SUNZHEN_36446874_FDS_Revised.pdf"
+BODY_PDF = ROOT / "SUNZHEN_36446874_Report_body.pdf"
+FINAL_PDF = ROOT / "SUNZHEN_36446874_Report.pdf"
+FDS_PDF = ROOT / "SUNZHEN_36446874_Presentation.pdf"
 FDS_DIR = ROOT / "fds_revised"
 SCREENSHOTS = ROOT / "report_screenshots"
 

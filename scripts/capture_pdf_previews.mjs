@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
 const outputDir = path.join(root, "report_preview_pages");
-const pdfUrl = "http://localhost:8000/SUNZHEN_36446874_DVP_Report_HD.pdf";
+const pdfUrl = "http://localhost:8000/SUNZHEN_36446874_Report.pdf";
 const debugBase = "http://127.0.0.1:9222";
 const pages = [2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15];
 

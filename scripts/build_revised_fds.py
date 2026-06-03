@@ -10,7 +10,7 @@ from reportlab.pdfgen import canvas
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "fds_revised"
-PDF_PATH = ROOT / "SUNZHEN_36446874_FDS_Revised.pdf"
+PDF_PATH = ROOT / "SUNZHEN_36446874_Presentation.pdf"
 
 WIDTH = 1600
 HEIGHT = 900

@@ -1,6 +1,6 @@
 # HD-Level Report Insertions
 
-Use these text blocks to strengthen `SUNZHEN_36446874_DVP_Report.pdf` before final export. They target the rubric areas most likely to separate a low HD submission from a 90% Part 2 submission: theory-grounded design justification, interaction rationale, implementation complexity, and reflective evaluation.
+Use these text blocks to strengthen `SUNZHEN_36446874_Report.pdf` before final export. They target the rubric areas most likely to separate a low HD submission from a 90% Part 2 submission: theory-grounded design justification, interaction rationale, implementation complexity, and reflective evaluation.
 
 ## Section 2: Design Rationale Replacement / Expansion
 
