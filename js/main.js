@@ -254,7 +254,7 @@ async function loadChartModules() {
     };
 
   try {
-    const module = await import("./annualTrend.js?v=20260603-tooltip-fix");
+    const module = await import("./annualTrend.js?v=20260603-report-v2");
     renderAnnualTrend = module.renderAnnualTrend || fallback("Annual trend");
   } catch (error) {
     console.warn("annualTrend.js not available yet.", error);
@@ -262,7 +262,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./seasonalPattern.js?v=20260603-tooltip-fix");
+    const module = await import("./seasonalPattern.js?v=20260603-report-v2");
     renderSeasonalPattern =
       module.renderSeasonalPattern || fallback("Seasonal pattern");
   } catch (error) {
@@ -271,16 +271,16 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./scatterDriver.js?v=20260603-tooltip-fix");
+    const module = await import("./scatterDriver.js?v=20260603-report-v2");
     renderScatterDriver =
-      module.renderScatterDriver || fallback("Sunshine driver");
+      module.renderScatterDriver || fallback("Sunshine relationship");
   } catch (error) {
     console.warn("scatterDriver.js not available yet.", error);
-    renderScatterDriver = fallback("Sunshine driver");
+    renderScatterDriver = fallback("Sunshine relationship");
   }
 
   try {
-    const module = await import("./extremeDays.js?v=20260603-tooltip-fix");
+    const module = await import("./extremeDays.js?v=20260603-report-v2");
     renderExtremeDays = module.renderExtremeDays || fallback("Extreme days");
   } catch (error) {
     console.warn("extremeDays.js not available yet.", error);
@@ -288,7 +288,7 @@ async function loadChartModules() {
   }
 
   try {
-    const module = await import("./storyController.js?v=20260603-tooltip-fix");
+    const module = await import("./storyController.js?v=20260603-report-v2");
     updateStoryStep = module.updateStoryStep || module.renderStoryStep || null;
   } catch (error) {
     console.warn("storyController.js not available yet.", error);

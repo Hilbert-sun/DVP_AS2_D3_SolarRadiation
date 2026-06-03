@@ -24,7 +24,8 @@ from reportlab.platypus import (
 ROOT = Path(__file__).resolve().parents[1]
 BODY_PDF = ROOT / "SUNZHEN_36446874_DVP_Report_HD_body.pdf"
 FINAL_PDF = ROOT / "SUNZHEN_36446874_DVP_Report_HD.pdf"
-PRESENTATION_PDF = ROOT / "SUNZHEN_36446874_Presentation.pdf"
+FDS_PDF = ROOT / "SUNZHEN_36446874_FDS_Revised.pdf"
+FDS_DIR = ROOT / "fds_revised"
 SCREENSHOTS = ROOT / "report_screenshots"
 
 
@@ -175,6 +176,19 @@ def fig(path, caption, styles, max_w=16.0 * cm, max_h=8.2 * cm):
     )
 
 
+def fds_fig(path, caption, styles, max_w=16.0 * cm, max_h=8.2 * cm):
+    image_path = FDS_DIR / path
+    with Image.open(image_path) as im:
+        w, h = im.size
+    scale = min(max_w / w, max_h / h)
+    return KeepTogether(
+        [
+            RLImage(str(image_path), width=w * scale, height=h * scale),
+            p(caption, styles["caption"]),
+        ]
+    )
+
+
 def data_table(rows, col_widths):
     table = Table(rows, colWidths=col_widths, hAlign="LEFT")
     table.setStyle(
@@ -186,6 +200,29 @@ def data_table(rows, col_widths):
                 ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
                 ("FONTSIZE", (0, 0), (-1, -1), 7.7),
                 ("LEADING", (0, 0), (-1, -1), 9.7),
+                ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#999999")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+    return table
+
+
+def text_table(rows, col_widths, styles):
+    paragraph_rows = []
+    for row_index, row in enumerate(rows):
+        style = styles["small"] if row_index else styles["small"]
+        paragraph_rows.append([p(str(cell), style) for cell in row])
+    table = Table(paragraph_rows, colWidths=col_widths, hAlign="LEFT")
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#999999")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 5),
@@ -290,10 +327,10 @@ def build_body():
                 ("3. Implementation", "6"),
                 ("3.1 Technical Implementation", "6"),
                 ("3.2 Interactive Narrative Visualisation Implementation", "7"),
-                ("3.3 Using the Implementation", "12"),
-                ("4. Conclusion and Reflection", "12"),
-                ("AI Declaration", "13"),
-                ("References", "13"),
+                ("3.3 Using the Implementation", "13"),
+                ("4. Conclusion and Reflection", "13"),
+                ("AI Declaration", "14"),
+                ("References", "14"),
                 ("Appendix A: Five Design Sheets", "15"),
             ],
             styles,
@@ -304,33 +341,39 @@ def build_body():
     story += [
         p("1. Introduction", styles["h1"]),
         p(
-            "This project presents an interactive narrative visualisation about solar radiation patterns at King's Park, Hong Kong. It transforms findings from the data exploration stage into a guided D3.js interface for Hong Kong urban planners and environmental policy advisors. The central message is that global solar radiation is strongly associated with sunshine duration, while rainfall and relative humidity help explain lower-radiation conditions, seasonal variation, and the context surrounding extreme solar radiation days.",
+            "This project presents an interactive narrative visualisation of solar radiation patterns at King's Park, Hong Kong. It transforms the data exploration findings into a guided D3.js interface for Hong Kong urban planners and environmental policy advisors. The submitted dataset contains 11,887 daily observations from 1992 to 2025, including global solar radiation (GSR), rainfall (RF), sunshine duration (SUN), and relative humidity (RH).",
             styles["body"],
         ),
         p(
-            "The audience may not need detailed statistical modelling, but it does need clear visual evidence that can support infrastructure planning, solar feasibility discussion, and climate-adaptation decisions. The design therefore avoids a purely exploratory dashboard. Instead, it uses a five-step narrative that moves from long-term context to seasonal rhythm, daily driver, extreme events, and planning implications.",
+            "The audience does not require a dense statistical dashboard, but it does require clear evidence that can support solar feasibility discussion, infrastructure planning, and climate-adaptation decisions. The design therefore uses a five-step narrative that moves from long-term context to seasonal rhythm, daily association, extreme events, and planning implications.",
             styles["body"],
         ),
-        p("Research questions and implementation response", styles["h2"]),
-        *kv_lines(
+        p("Hypotheses and validated findings", styles["h2"]),
+        text_table(
             [
-                (
-                    "Long-term relationship",
-                    "Step 1 shows standardised annual GSR and rainfall trends, preserving raw values in tooltips.",
-                ),
-                (
-                    "Seasonal climate rhythm",
-                    "Step 2 compares standardised monthly rhythms across GSR, rainfall, sunshine duration, and relative humidity.",
-                ),
-                (
-                    "Extreme solar conditions",
-                    "Step 4 identifies the top 5% GSR days and links top events back to the SUN-GSR scatterplot.",
-                ),
+                ["<b>Hypothesis</b>", "<b>Result from the final dataset</b>", "<b>Interpretation used in the visualisation</b>"],
+                [
+                    "<b>H1:</b> GSR and rainfall are inversely related.",
+                    "Supported, but not strongly deterministic. Daily GSR-RF correlation is r = -0.309 and annual GSR-RF correlation is r = -0.265.",
+                    "Step 1 shows the inverse long-term tendency while retaining year-to-year variability.",
+                ],
+                [
+                    "<b>H2:</b> Sunshine duration has the strongest positive relationship with GSR, while humidity is negative.",
+                    "Supported. Daily SUN-GSR correlation is r = 0.909; RH-GSR correlation is r = -0.345.",
+                    "Step 3 describes SUN as the strongest observed association, not as a causal predictor.",
+                ],
+                [
+                    "<b>H3:</b> Extreme GSR days occur in high-sunshine, low-rainfall, low-humidity seasonal windows.",
+                    "Partially supported and refined. The 595 top 5% GSR days average SUN 10.85 hours and RF 0.47 mm; 422 occur in summer. RH is only slightly lower than non-extreme days.",
+                    "Step 4 emphasises high sunshine, very low rainfall, and summer concentration. Humidity is treated as supporting context rather than a defining signature.",
+                ],
             ],
+            [3.6 * cm, 6.2 * cm, 6.2 * cm],
             styles,
         ),
+        Spacer(1, 0.2 * cm),
         p(
-            "The final implementation is designed to be readable without the report: story navigation, chart titles, legends, tooltips, an insight panel, and planning takeaways work together to communicate the narrative inside the interface itself.",
+            "The final implementation is designed to be readable without the report: story navigation, chart titles, legends, tooltips, an insight panel, and planning takeaways communicate the narrative inside the interface itself. The wording is deliberately evidence-aware: association is not described as causation, and the humidity hypothesis is explicitly refined rather than overstated.",
             styles["callout"],
         ),
         PageBreak(),
@@ -344,20 +387,32 @@ def build_body():
             styles["body"],
         ),
         p(
-            "The narrative structure moves from context to explanation and then to action: (1) long-term annual variability, (2) monthly seasonal rhythm, (3) the daily relationship between sunshine duration and solar radiation, (4) extreme solar radiation days, and (5) planning takeaways. This sequence reduces cognitive load by introducing simpler temporal patterns before the denser multivariate scatterplot.",
+            "The narrative structure moves from context to explanation and then to action: (1) long-term annual variability, (2) monthly seasonal rhythm, (3) the daily SUN-GSR relationship, (4) extreme solar radiation days, and (5) planning takeaways. This sequence reduces cognitive load by introducing simpler temporal patterns before the denser multivariate scatterplot and rare-event evidence.",
             styles["body"],
         ),
         p("2.2 Five Design Sheet Development", styles["h2"]),
         p(
-            "Sheet 1 generated possible encodings and interactions, including annual trend lines, monthly climate rhythm charts, GSR boxplots, SUN-GSR scatterplots, seasonal facets, LOESS curves, season cards, extreme solar days, story steps, and interaction controls. Dense pairplots and raw daily line charts were removed because they were too noisy for the audience. A map was removed because the dataset represents one station rather than spatial variation.",
+            "The Part 1 demonstration feedback identified that the original design sheets needed clearer draft sketches. The revised Five Design Sheets in Appendix A preserve the original design intent, but they now communicate the proposed visual evidence more honestly and concretely through chart sketches, interaction arrows, layout annotations, and explicit design trade-offs. This revision is documented as a response to feedback rather than presented as if it existed before the Part 1 demonstration.",
             styles["body"],
         ),
         p(
-            "Sheets 2, 3, and 4 explored three alternative complete designs. Sheet 2 used a scrollytelling climate story, which offered strong guidance but reduced comparison flexibility. Sheet 3 used a guided story dashboard with a main chart, insight panel, story navigation, and controls. Sheet 4 focused on seasonal and extreme-event exploration. The final realisation combines the guided dashboard from Sheet 3 with the seasonal and extreme-event emphasis from Sheet 4.",
+            "Sheet 1 records divergent ideas: annual trend lines, monthly climate rhythm, a SUN-GSR scatterplot, extreme-day summaries, story steps, filters, tooltips, and linked date tracing. It also shows ideas that were removed. A map was rejected because the dataset represents one station rather than spatial variation; a raw daily line chart and dense pairplot were rejected because they would be too noisy for the target audience.",
             styles["body"],
         ),
+        text_table(
+            [
+                ["<b>Sheet</b>", "<b>Complete design concept</b>", "<b>Decision</b>"],
+                ["2", "Scrollytelling climate story: a linear article-style sequence with one claim and one chart per section.", "Retain the strong guidance, but reject the limited ability to revisit and compare evidence."],
+                ["3", "Guided story dashboard: stable story navigation, main chart, insight panel, and focused controls.", "Selected as the structural basis of the implementation."],
+                ["4", "Seasonal and extreme-event explorer: prioritises monthly rhythm, extreme-day counts, summary cards, and record details.", "Carry its strongest seasonal and rare-event evidence into the guided dashboard."],
+                ["5", "Final realisation: a five-step narrative combining the structure of Sheet 3 with the evidence emphasis of Sheet 4.", "Used as the implementation specification for the D3.js application."],
+            ],
+            [1.1 * cm, 8.2 * cm, 6.7 * cm],
+            styles,
+        ),
+        Spacer(1, 0.2 * cm),
         p(
-            "A change was made after the Part 1 design presentation: Sheet 5 originally listed R Shiny as the intended implementation environment, but the final implementation uses D3.js. This change was made because the final design needed direct SVG control, custom story-step state, and linked highlighting between views. These interaction requirements are more naturally implemented in D3 than in a Shiny layout based mainly on packaged chart outputs.",
+            "A second change was made after the Part 1 design presentation: the original final sheet listed R Shiny as the intended implementation environment, but the final implementation uses D3.js. Direct SVG control, custom story-step state, and linked highlighting between views are more naturally implemented in D3 than in a Shiny layout based mainly on packaged chart outputs.",
             styles["callout"],
         ),
         PageBreak(),
@@ -374,7 +429,7 @@ def build_body():
             styles["body"],
         ),
         p(
-            "The scatterplot uses position for SUN and GSR because position on common scales supports more accurate quantitative comparison than colour or area. Rainfall is encoded by point size and humidity by colour because they are contextual variables. This ordering reflects the narrative hierarchy: the SUN-GSR relationship is primary, while rainfall and humidity explain conditions around lower or extreme radiation days.",
+            "The scatterplot uses position for SUN and GSR because position on common scales supports more accurate quantitative comparison than colour or area. Rainfall is encoded by point size and humidity by colour because they are contextual variables. This ordering reflects the narrative hierarchy: the SUN-GSR association is primary, rainfall helps explain wet low-radiation conditions, and humidity provides secondary context without being overclaimed as a defining extreme-day feature.",
             styles["body"],
         ),
         p(
@@ -388,6 +443,12 @@ def build_body():
         p(
             "The final design deliberately avoids a map, despite the planning context, because the available data is station-level and contains no spatial variation. Including a map would imply a spatial analytic claim that the data cannot support. This decision reflects the principle that visual form should match the evidence available, not only the topic domain.",
             styles["body"],
+        ),
+        fds_fig(
+            "sheet5_revised.png",
+            "Revised Sheet 5 documents the final implementable design, chart sketches, interaction link, and evidence-aware wording.",
+            styles,
+            max_h=6.8 * cm,
         ),
         PageBreak(),
     ]
@@ -426,6 +487,10 @@ def build_body():
             styles["body"],
         ),
         p(
+            "For the default full-record view, the top 5% threshold is GSR 24.237 MJ/m2 and identifies 595 extreme days. The application does not treat this threshold as a universal physical definition; it is a relative threshold that updates when the current selection changes.",
+            styles["body"],
+        ),
+        p(
             "The implementation was kept as a static client-side application so that the marker can run it with a simple local server. This avoids installation complexity and aligns with the assignment requirement that data be read from submitted files rather than remote services.",
             styles["body"],
         ),
@@ -451,7 +516,7 @@ def build_body():
             max_h=6.6 * cm,
         ),
         p(
-            "Step 1 introduces long-term climate context. Because GSR and rainfall have different units, values are standardised for visual comparison while tooltips retain raw values. This avoids implying that the two physical variables are directly equivalent.",
+            "Step 1 introduces long-term climate context. Because GSR and rainfall have different units, values are standardised for visual comparison while tooltips retain raw values. The annual GSR-RF correlation is r = -0.265, supporting an inverse tendency while also showing that rainfall does not fully determine annual solar radiation.",
             styles["body"],
         ),
         PageBreak(),
@@ -463,10 +528,10 @@ def build_body():
             "fig3_seasonal_rhythm.png",
             "Figure 3. Step 2 compares monthly climate rhythm across GSR, rainfall, sunshine, and humidity.",
             styles,
-            max_h=6.6 * cm,
+            max_h=11.0 * cm,
         ),
         p(
-            "Step 2 shifts from annual context to monthly seasonality. It highlights that Hong Kong's warmer months can combine high solar radiation with wet and humid conditions, which is useful for planners considering both solar potential and weather-related generation risk.",
+            "Step 2 shifts from annual context to monthly seasonality. GSR and SUN both reach their highest monthly mean in July, while rainfall peaks in August and relative humidity peaks in June. This overlap shows that Hong Kong's summer solar opportunity exists within a wet and humid seasonal context, which is useful for planners considering both potential output and weather-related generation risk.",
             styles["body"],
         ),
         PageBreak(),
@@ -476,12 +541,12 @@ def build_body():
         p("3.2 Interactive Narrative Visualisation Implementation continued", styles["h2"]),
         fig(
             "fig4_sunshine_driver.png",
-            "Figure 4. Step 3 shows sunshine duration as the clearest visual driver of solar radiation.",
+            "Figure 4. Step 3 shows sunshine duration as the clearest observed association with solar radiation.",
             styles,
-            max_h=7.4 * cm,
+            max_h=11.0 * cm,
         ),
         p(
-            "Step 3 presents the strongest daily relationship identified during exploration: sunshine duration and global solar radiation. SUN is placed on the x-axis and GSR on the y-axis. Rainfall is encoded by point size and relative humidity by colour. When extreme-day highlighting is enabled, non-extreme points remain visible in the background so that peak events can be interpreted against the full daily context.",
+            "Step 3 presents the strongest daily association identified during exploration: sunshine duration and global solar radiation, with r = 0.909. SUN is placed on the x-axis and GSR on the y-axis. Rainfall is encoded by point size and relative humidity by colour. When extreme-day highlighting is enabled, non-extreme points remain visible in the background so that peak events can be interpreted against the full daily context.",
             styles["body"],
         ),
         PageBreak(),
@@ -493,10 +558,29 @@ def build_body():
             "fig5_extreme_days.png",
             "Figure 5. Step 4 summarises top 5% GSR days and provides concrete high-radiation records.",
             styles,
-            max_h=8.4 * cm,
+            max_h=12.5 * cm,
         ),
         p(
-            "Step 4 focuses on the top 5% of GSR observations. Summary cards communicate the number of extreme days and their average GSR, SUN, RF, and RH values. A seasonal bar chart shows the distribution of these events, and the top-10 table provides concrete examples. The table dates are linked: clicking a date jumps to Step 3 and highlights the same record in the scatterplot.",
+            "Step 4 focuses on the top 5% of GSR observations in the current selection. In the default full-record view, the 595 extreme days average GSR 25.79 MJ/m2, SUN 10.85 hours, RF 0.47 mm, and RH 75.03%. Their seasonal distribution is strongly concentrated in summer: 422 occur in summer, 157 in spring, 16 in autumn, and none in winter. The very low rainfall and high sunshine are clear signatures; RH is only slightly lower than the non-extreme mean of 76.90%, so the final narrative does not overstate humidity.",
+            styles["body"],
+        ),
+        p(
+            "The top-10 table provides concrete examples, and its dates are linked: clicking a date jumps to Step 3 and highlights the same record in the scatterplot. This connection lets the reader move from a summary claim to an individual observation without losing the full daily context.",
+            styles["body"],
+        ),
+        PageBreak(),
+    ]
+
+    story += [
+        p("3.2 Interactive Narrative Visualisation Implementation continued", styles["h2"]),
+        fig(
+            "fig7_linked_extreme_day.png",
+            "Figure 6. A selected top-10 extreme date is traced from Step 4 into the Step 3 scatterplot.",
+            styles,
+            max_h=11.0 * cm,
+        ),
+        p(
+            "The linked highlight is the most important coordinated interaction in the final implementation. It supports traceability between aggregate evidence and a specific record, while the dashed guide and annotation make the selected date visible without removing the surrounding observations.",
             styles["body"],
         ),
         PageBreak(),
@@ -506,12 +590,12 @@ def build_body():
         p("3.2 Interactive Narrative Visualisation Implementation continued", styles["h2"]),
         fig(
             "fig6_planning_takeaway.png",
-            "Figure 6. Step 5 translates the visual findings into planning takeaways.",
+            "Figure 7. Step 5 translates the visual findings into planning takeaways.",
             styles,
-            max_h=6.9 * cm,
+            max_h=10.5 * cm,
         ),
         p(
-            "Step 5 closes the narrative by translating the evidence into planning implications. It avoids adding a further complex chart because the goal of the final step is synthesis: solar potential is seasonally structured, sunshine duration is the clearest driver, and rainfall and humidity shape low-radiation conditions.",
+            "Step 5 closes the narrative by translating the evidence into planning implications. It avoids adding a further complex chart because the goal is synthesis: solar potential is seasonally structured, sunshine duration has the clearest observed association, wet conditions reduce solar opportunity, and extreme high-radiation opportunities cluster in summer. Humidity is retained as supporting context rather than a headline conclusion.",
             styles["body"],
         ),
         PageBreak(),
@@ -536,15 +620,19 @@ def build_body():
         ),
         p("4. Conclusion and Reflection", styles["h1"]),
         p(
-            "This project transformed exploratory climate analysis into an interactive narrative visualisation. The final implementation communicates that solar radiation at King's Park is closely related to sunshine duration, while rainfall and relative humidity help explain seasonal and lower-radiation conditions. The guided structure leads users from long-term context to monthly patterns, daily relationships, extreme solar days, and planning implications.",
+            "This project transformed exploratory climate analysis into an interactive narrative visualisation. The final evidence supports the main hypothesis that sunshine duration has the strongest observed daily association with GSR (r = 0.909) and supports an inverse relationship between GSR and rainfall (daily r = -0.309; annual r = -0.265). It also shows that the top 5% GSR days are primarily high-sunshine, very low-rainfall summer events.",
             styles["body"],
         ),
         p(
-            "A key design trade-off was between analytical completeness and narrative clarity. A more technical interface could have included regression models, seasonal correlation matrices, or additional meteorological variables. However, this would have increased cognitive load and moved the project away from the needs of planning and policy audiences. The final design therefore prioritises a coherent explanation of the strongest exploratory findings rather than presenting every possible analysis.",
+            "The humidity component of the original extreme-day hypothesis required refinement. Relative humidity is negatively associated with GSR overall, but extreme-day RH is only slightly lower than the non-extreme mean. The final visualisation therefore uses humidity as contextual encoding and avoids claiming that low humidity is a defining extreme-day signature. This is an important outcome of the design process: the narrative was changed to match the evidence rather than forcing the evidence to match the initial assumption.",
             styles["body"],
         ),
         p(
-            "If extended further, the most valuable improvement would be stronger linked brushing across all views. Selecting a seasonal bar or an extreme-day record could highlight the same subset across the annual trend, monthly rhythm, scatterplot, and extreme-day table. A second improvement would be to incorporate urban-form variables such as roof geometry, shading, and electricity demand so that the visualisation could move from climate-context evidence toward site-specific planning support.",
+            "A key design trade-off was between analytical completeness and narrative clarity. A more technical interface could include regression models, seasonal correlation matrices, or additional meteorological variables, but this would increase cognitive load for the planning audience. The final design prioritises a coherent explanation of the strongest exploratory findings, supported by purposeful interaction and a documented response to Part 1 feedback.",
+            styles["body"],
+        ),
+        p(
+            "If extended further, the most valuable improvement would be stronger linked brushing across all views. Selecting a seasonal bar or an extreme-day record could highlight the same subset across the annual trend, monthly rhythm, scatterplot, and extreme-day table. A second improvement would be to incorporate urban-form variables such as roof geometry, shading, and electricity demand so that the visualisation could move from station-level climate evidence toward site-specific planning support.",
             styles["body"],
         ),
         PageBreak(),
@@ -568,7 +656,7 @@ def build_body():
         PageBreak(),
         p("Appendix A: Five Design Sheets", styles["h1"]),
         p(
-            "The following five pages reproduce the Five Design Sheets from the Part 1 design presentation: brainstorming, three alternative complete designs, and the final realisation used as the basis for the implemented D3 narrative visualisation.",
+            "The following five pages contain the revised Five Design Sheets: brainstorming, three alternative complete designs, and the final realisation used as the basis for the implemented D3 narrative visualisation. These sheets were improved after the Part 1 demonstration feedback requested clearer draft chart sketches. The revision adds visual encodings, interaction arrows, evidence notes, and explicit design decisions while preserving the original design direction.",
             styles["body"],
         ),
     ]
@@ -582,13 +670,13 @@ def append_design_sheets():
     for page in body.pages:
         writer.add_page(page)
 
-    appendix = PdfReader(str(PRESENTATION_PDF))
-    # Pages 2-6 of the presentation are the five design sheets.
-    for index in range(1, 6):
-        writer.add_page(appendix.pages[index])
+    appendix = PdfReader(str(FDS_PDF))
+    for page in appendix.pages:
+        writer.add_page(page)
 
     with FINAL_PDF.open("wb") as handle:
         writer.write(handle)
+    BODY_PDF.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

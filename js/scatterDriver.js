@@ -77,7 +77,7 @@ export function renderScatterDriver(containerSelector, data, state) {
       .attr("y", 32)
       .attr("font-size", 20)
       .attr("font-weight", 600)
-      .text("Sunshine as the main driver of solar radiation");
+      .text("Sunshine duration and solar radiation");
 
     const selectedRow = state?.selectedExtremeDate
       ? filtered.find((row) => getDateKey(row, d3) === state.selectedExtremeDate)

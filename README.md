@@ -3,6 +3,8 @@
 ## Description
 An interactive D3.js narrative visualisation explaining how solar radiation at King's Park relates to sunshine duration, rainfall, relative humidity, seasonality, and extreme solar radiation days. The story is organised into five guided steps with coordinated filters, tooltips, and linked highlighting between the extreme-day table and the sunshine-GSR scatterplot.
 
+The final evidence supports three refined findings: sunshine duration has the strongest observed daily association with GSR, rainfall is inversely associated with GSR, and top 5% GSR days are primarily high-sunshine, low-rainfall summer events. Relative humidity remains useful context, but it is not treated as a defining extreme-day signature.
+
 ## Target Audience
 Hong Kong urban planners and environmental policy advisors.
 

@@ -157,6 +157,36 @@ p {
   box-shadow: var(--shadow);
 }
 
+.takeaway-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 1.5rem;
+}
+
+.takeaway-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--surface-alt);
+}
+
+.takeaway-card h4 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.takeaway-card p,
+.takeaway-notes p {
+  margin-bottom: 0.55rem;
+}
+
+.takeaway-notes {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
 .control-bar {
   max-width: 1300px;
   margin: 1.75rem auto 2.5rem;
@@ -278,6 +308,10 @@ button {
   }
 
   .control-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .takeaway-cards {
     grid-template-columns: 1fr;
   }
 }

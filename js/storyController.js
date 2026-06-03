@@ -14,10 +14,10 @@ export function getInsightText(step) {
   switch (Number(step)) {
     case 1:
       return (
-        "Annual global solar radiation and rainfall trends show year-to-year variability " +
-        "that reflect broader climate patterns. Urban planners should account for this " +
-        "inter-annual variability when forecasting long-term solar generation capacity and " +
-        "designing climate-resilient infrastructure."
+        "Annual global solar radiation and rainfall show an inverse but variable relationship " +
+        "across the record. Urban planners should account for this inter-annual variability " +
+        "when forecasting long-term solar generation capacity and designing climate-resilient " +
+        "infrastructure."
       );
     case 2:
       return (
@@ -28,15 +28,15 @@ export function getInsightText(step) {
       );
     case 3:
       return (
-        "Sunshine duration emerges as the strongest predictor of solar radiation in daily data. " +
+        "Sunshine duration has the strongest observed association with solar radiation in daily data. " +
         "The extreme-day highlight keeps rare high-radiation events visible inside the full daily " +
         "context, helping policy advisors compare peak opportunities with normal operating conditions."
       );
     case 4:
       return (
-        "The top 5% solar radiation days concentrate in specific seasons and carry distinct " +
-        "weather signatures combining low humidity and high sunshine. Click any top-10 date to trace " +
-        "that individual event back to the multivariate scatterplot and inspect why it stands out."
+        "The top 5% solar radiation days are concentrated in summer and are characterised most clearly " +
+        "by high sunshine duration and very low rainfall. Relative humidity is only slightly lower on " +
+        "average. Click any top-10 date to trace that event back to the multivariate scatterplot."
       );
     case 5:
       return (
@@ -100,14 +100,19 @@ export function renderPlanningTakeaway(containerSelector, data, state) {
         "Design solar strategies that align with the strongest seasonal radiation windows.",
     },
     {
-      title: "Sunshine duration is the clearest driver",
+      title: "Sunshine duration is the clearest association",
       body:
         "Use sunshine availability as the primary indicator when screening solar sites.",
     },
     {
-      title: "Rainfall and humidity shape low-radiation conditions",
+      title: "Wet conditions reduce solar opportunity",
       body:
-        "Plan for reduced output during wet, humid periods and incorporate resilience measures.",
+        "Plan for reduced output during rainy periods and treat humidity as supporting context.",
+    },
+    {
+      title: "Extreme opportunities cluster in summer",
+      body:
+        "Use the high-sunshine, low-rainfall extreme-day pattern to plan seasonal capacity.",
     },
   ];
 

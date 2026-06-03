@@ -113,7 +113,7 @@ function renderTopTable(container, rows, d3, onSelectExtremeDay) {
         button.textContent = value;
         button.setAttribute(
           "aria-label",
-          `Highlight ${value} in the sunshine driver scatterplot`
+          `Highlight ${value} in the sunshine-GSR scatterplot`
         );
         button.addEventListener("click", () => onSelectExtremeDay(dateLabel));
         td.appendChild(button);
