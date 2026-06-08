@@ -60,11 +60,20 @@ def make_styles():
             "TitleCustom",
             parent=base["Title"],
             fontName=FONT_BODY_BOLD,
-            fontSize=24,
-            leading=30,
-            alignment=TA_CENTER,
+            fontSize=28,
+            leading=34,
+            alignment=TA_LEFT,
             textColor=colors.black,
             spaceAfter=18,
+        ),
+        "cover_kicker": ParagraphStyle(
+            "CoverKicker",
+            parent=base["Normal"],
+            fontName=FONT_BODY_BOLD,
+            fontSize=10,
+            leading=13,
+            textColor=colors.HexColor("#333333"),
+            spaceAfter=12,
         ),
         "subtitle": ParagraphStyle(
             "SubtitleCustom",
@@ -72,9 +81,76 @@ def make_styles():
             fontName=FONT_BODY,
             fontSize=12,
             leading=16,
-            alignment=TA_CENTER,
+            alignment=TA_LEFT,
             textColor=colors.HexColor("#333333"),
             spaceAfter=8,
+        ),
+        "cover_note": ParagraphStyle(
+            "CoverNote",
+            parent=base["Normal"],
+            fontName=FONT_BODY_ITALIC,
+            fontSize=10.8,
+            leading=15,
+            alignment=TA_LEFT,
+            textColor=colors.HexColor("#333333"),
+            spaceAfter=8,
+        ),
+        "cover_meta": ParagraphStyle(
+            "CoverMeta",
+            parent=base["Normal"],
+            fontName=FONT_BODY,
+            fontSize=10.5,
+            leading=14,
+            textColor=colors.black,
+            spaceAfter=0,
+        ),
+        "toc_title": ParagraphStyle(
+            "TOCTitle",
+            parent=base["Heading1"],
+            fontName=FONT_BODY_BOLD,
+            fontSize=22,
+            leading=28,
+            textColor=colors.black,
+            spaceBefore=0,
+            spaceAfter=16,
+        ),
+        "toc_main": ParagraphStyle(
+            "TOCMain",
+            parent=base["BodyText"],
+            fontName=FONT_BODY,
+            fontSize=11.4,
+            leading=18,
+            leftIndent=0,
+            spaceAfter=3,
+        ),
+        "toc_sub": ParagraphStyle(
+            "TOCSub",
+            parent=base["BodyText"],
+            fontName=FONT_BODY,
+            fontSize=10.2,
+            leading=16,
+            leftIndent=16,
+            textColor=colors.HexColor("#333333"),
+            spaceAfter=2,
+        ),
+        "lead": ParagraphStyle(
+            "Lead",
+            parent=base["BodyText"],
+            fontName=FONT_BODY,
+            fontSize=11.2,
+            leading=16,
+            textColor=colors.black,
+            spaceAfter=8,
+        ),
+        "finding_label": ParagraphStyle(
+            "FindingLabel",
+            parent=base["BodyText"],
+            fontName=FONT_BODY_BOLD,
+            fontSize=10.3,
+            leading=13,
+            textColor=colors.black,
+            spaceBefore=4,
+            spaceAfter=1,
         ),
         "h1": ParagraphStyle(
             "H1",
@@ -238,6 +314,25 @@ def data_table(rows, col_widths):
     return table
 
 
+def cover_meta_table(rows, styles):
+    table_rows = [[p(f"<b>{key}</b>", styles["cover_meta"]), p(value, styles["cover_meta"])] for key, value in rows]
+    table = Table(table_rows, colWidths=[4.6 * cm, 10.7 * cm], hAlign="LEFT")
+    table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LINEABOVE", (0, 0), (-1, 0), 0.4, colors.HexColor("#777777")),
+                ("LINEBELOW", (0, -1), (-1, -1), 0.4, colors.HexColor("#777777")),
+            ]
+        )
+    )
+    return table
+
+
 def text_table(rows, col_widths, styles):
     paragraph_rows = []
     for row_index, row in enumerate(rows):
@@ -268,6 +363,23 @@ def rule():
     return table
 
 
+def light_rule(width=16.4 * cm):
+    table = Table([[""]], colWidths=[width], rowHeights=[0.02 * cm])
+    table.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#cccccc"))]))
+    return table
+
+
+def finding_block(number, title, result, interpretation, styles):
+    return KeepTogether(
+        [
+            p(f"Finding {number}. {title}", styles["finding_label"]),
+            p(f"<b>Evidence:</b> {result}", styles["body"]),
+            p(f"<b>How it appears in the interface:</b> {interpretation}", styles["body"]),
+            Spacer(1, 0.08 * cm),
+        ]
+    )
+
+
 def kv_lines(items, styles):
     flow = []
     for key, value in items:
@@ -280,7 +392,12 @@ def toc_line(title, page, styles):
 
 
 def toc_table(items, styles):
-    rows = [[p(title, styles["toc"]), p(page, styles["toc"])] for title, page in items]
+    rows = []
+    for title, page in items:
+        prefix = title.split()[0]
+        is_sub = prefix.rstrip(".").count(".") >= 1 and prefix[0].isdigit()
+        style = styles["toc_sub"] if is_sub else styles["toc_main"]
+        rows.append([p(title, style), p(page, style)])
     table = Table(rows, colWidths=[14.7 * cm, 1.1 * cm], hAlign="LEFT")
     table.setStyle(
         TableStyle(
@@ -291,7 +408,6 @@ def toc_table(items, styles):
                 ("RIGHTPADDING", (0, 0), (-1, -1), 0),
                 ("TOPPADDING", (0, 0), (-1, -1), 2),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
-                ("LINEBELOW", (0, 0), (-1, -1), 0.15, colors.HexColor("#dddddd")),
             ]
         )
     )
@@ -312,16 +428,15 @@ def build_body():
     story = []
 
     story += [
-        Spacer(1, 3.0 * cm),
+        Spacer(1, 1.65 * cm),
+        p("FIT5147 Data Exploration and Visualisation", styles["cover_kicker"]),
         p("When Sunshine Meets Rain", styles["title"]),
-        rule(),
-        Spacer(1, 0.45 * cm),
+        light_rule(9.6 * cm),
+        Spacer(1, 0.35 * cm),
         p("Understanding Solar Radiation Patterns at King's Park, Hong Kong", styles["subtitle"]),
-        Spacer(1, 0.6 * cm),
-        p("FIT5147 Data Exploration and Visualisation", styles["subtitle"]),
-        p("Data Visualisation Project - Part 2 Report", styles["subtitle"]),
-        Spacer(1, 1.0 * cm),
-        data_table(
+        p("Data Visualisation Project - Part 2 Report", styles["cover_note"]),
+        Spacer(1, 1.25 * cm),
+        cover_meta_table(
             [
                 ["Student name", "Sun Zhen"],
                 ["Student ID", "36446874"],
@@ -329,21 +444,21 @@ def build_body():
                 ["Teaching Associate", "Dr Ting Chai Wen"],
                 ["Implementation technology", "D3.js, HTML, CSS, JavaScript"],
             ],
-            [5.0 * cm, 10.0 * cm],
+            styles,
         ),
-        Spacer(1, 0.8 * cm),
+        Spacer(1, 1.05 * cm),
         p(
-            "This report documents the design process, implementation, interaction design, and reflection for an interactive narrative visualisation built with D3.js.",
-            styles["subtitle"],
+            "This report documents the design process, implementation, interaction design, and reflection for an interactive narrative visualisation built with D3.js. The visualisation turns daily solar radiation, rainfall, sunshine, and humidity records into a five-step story for planning-oriented interpretation.",
+            styles["cover_note"],
         ),
         PageBreak(),
     ]
 
     story += [
-        p("Table of Contents", styles["h1"]),
-        Spacer(1, 0.2 * cm),
-        rule(),
-        Spacer(1, 0.45 * cm),
+        Spacer(1, 0.6 * cm),
+        p("Contents", styles["toc_title"]),
+        light_rule(16.4 * cm),
+        Spacer(1, 0.35 * cm),
         toc_table(
             [
                 ("1. Introduction", "3"),
@@ -369,33 +484,32 @@ def build_body():
         p("1. Introduction", styles["h1"]),
         p(
             "This project presents an interactive narrative visualisation of solar radiation patterns at King's Park, Hong Kong. It transforms the data exploration findings into a guided D3.js interface for Hong Kong urban planners and environmental policy advisors. The submitted dataset contains 11,887 daily observations from 1992 to 2025, including global solar radiation (GSR), rainfall (RF), sunshine duration (SUN), and relative humidity (RH).",
-            styles["body"],
+            styles["lead"],
         ),
         p(
             "The audience does not require a dense statistical dashboard, but it does require clear evidence that can support solar feasibility discussion, infrastructure planning, and climate-adaptation decisions. The design therefore uses a five-step narrative that moves from long-term context to seasonal rhythm, daily association, extreme events, and planning implications.",
             styles["body"],
         ),
         p("Hypotheses and validated findings", styles["h2"]),
-        text_table(
-            [
-                ["<b>Hypothesis</b>", "<b>Result from the final dataset</b>", "<b>Interpretation used in the visualisation</b>"],
-                [
-                    "<b>H1:</b> GSR and rainfall are inversely related.",
-                    "Supported, but not strongly deterministic. Daily GSR-RF correlation is r = -0.309 and annual GSR-RF correlation is r = -0.265.",
-                    "Step 1 shows the inverse long-term tendency while retaining year-to-year variability.",
-                ],
-                [
-                    "<b>H2:</b> Sunshine duration has the strongest positive relationship with GSR, while humidity is negative.",
-                    "Supported. Daily SUN-GSR correlation is r = 0.909; RH-GSR correlation is r = -0.345.",
-                    "Step 3 describes SUN as the strongest observed association, not as a causal predictor.",
-                ],
-                [
-                    "<b>H3:</b> Extreme GSR days occur in high-sunshine, low-rainfall, low-humidity seasonal windows.",
-                    "Partially supported and refined. The 595 top 5% GSR days average SUN 10.85 hours and RF 0.47 mm; 422 occur in summer. RH is only slightly lower than non-extreme days.",
-                    "Step 4 emphasises high sunshine, very low rainfall, and summer concentration. Humidity is treated as supporting context rather than a defining signature.",
-                ],
-            ],
-            [3.6 * cm, 6.2 * cm, 6.2 * cm],
+        finding_block(
+            "1",
+            "GSR and rainfall are inversely related, but the relationship is not deterministic.",
+            "The daily GSR-RF correlation is r = -0.309 and the annual GSR-RF correlation is r = -0.265.",
+            "Step 1 presents the inverse long-term tendency while keeping year-to-year variation visible.",
+            styles,
+        ),
+        finding_block(
+            "2",
+            "Sunshine duration is the clearest observed driver of daily solar radiation.",
+            "The daily SUN-GSR correlation is r = 0.909, while RH-GSR is negative at r = -0.345.",
+            "Step 3 treats SUN as the strongest observed association and avoids presenting it as a causal model.",
+            styles,
+        ),
+        finding_block(
+            "3",
+            "Extreme GSR days are mainly high-sunshine, very low-rainfall summer events.",
+            "The 595 top 5% GSR days average SUN 10.85 hours and RF 0.47 mm; 422 occur in summer. RH is only slightly lower than non-extreme days.",
+            "Step 4 emphasises sunshine, low rainfall, and seasonal concentration, with humidity retained as supporting context.",
             styles,
         ),
         Spacer(1, 0.2 * cm),
