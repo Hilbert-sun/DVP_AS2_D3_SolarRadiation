@@ -7,6 +7,8 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
     Image as RLImage,
     KeepTogether,
@@ -28,6 +30,28 @@ FDS_PDF = ROOT / "SUNZHEN_36446874_Presentation.pdf"
 FDS_DIR = ROOT / "fds_revised"
 SCREENSHOTS = ROOT / "report_screenshots"
 
+FONT_BODY = "TimesNewRoman"
+FONT_BODY_BOLD = "TimesNewRoman-Bold"
+FONT_BODY_ITALIC = "TimesNewRoman-Italic"
+
+
+def register_fonts():
+    fonts_dir = Path(r"C:\Windows\Fonts")
+    pdfmetrics.registerFont(TTFont(FONT_BODY, str(fonts_dir / "times.ttf")))
+    pdfmetrics.registerFont(TTFont(FONT_BODY_BOLD, str(fonts_dir / "timesbd.ttf")))
+    pdfmetrics.registerFont(TTFont(FONT_BODY_ITALIC, str(fonts_dir / "timesi.ttf")))
+    pdfmetrics.registerFont(TTFont("TimesNewRoman-BoldItalic", str(fonts_dir / "timesbi.ttf")))
+    pdfmetrics.registerFontFamily(
+        FONT_BODY,
+        normal=FONT_BODY,
+        bold=FONT_BODY_BOLD,
+        italic=FONT_BODY_ITALIC,
+        boldItalic="TimesNewRoman-BoldItalic",
+    )
+
+
+register_fonts()
+
 
 def make_styles():
     base = getSampleStyleSheet()
@@ -35,9 +59,9 @@ def make_styles():
         "title": ParagraphStyle(
             "TitleCustom",
             parent=base["Title"],
-            fontName="Helvetica-Bold",
-            fontSize=22,
-            leading=28,
+            fontName=FONT_BODY_BOLD,
+            fontSize=24,
+            leading=30,
             alignment=TA_CENTER,
             textColor=colors.black,
             spaceAfter=18,
@@ -45,9 +69,9 @@ def make_styles():
         "subtitle": ParagraphStyle(
             "SubtitleCustom",
             parent=base["Normal"],
-            fontName="Helvetica",
+            fontName=FONT_BODY,
             fontSize=12,
-            leading=17,
+            leading=16,
             alignment=TA_CENTER,
             textColor=colors.HexColor("#333333"),
             spaceAfter=8,
@@ -55,19 +79,19 @@ def make_styles():
         "h1": ParagraphStyle(
             "H1",
             parent=base["Heading1"],
-            fontName="Helvetica-Bold",
-            fontSize=15,
-            leading=19,
+            fontName=FONT_BODY_BOLD,
+            fontSize=15.5,
+            leading=20,
             textColor=colors.black,
-            spaceBefore=10,
+            spaceBefore=12,
             spaceAfter=8,
         ),
         "h2": ParagraphStyle(
             "H2",
             parent=base["Heading2"],
-            fontName="Helvetica-Bold",
-            fontSize=11.2,
-            leading=15,
+            fontName=FONT_BODY_BOLD,
+            fontSize=12.2,
+            leading=16,
             textColor=colors.black,
             spaceBefore=8,
             spaceAfter=4,
@@ -75,36 +99,36 @@ def make_styles():
         "body": ParagraphStyle(
             "Body",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=9.4,
-            leading=13.8,
+            fontName=FONT_BODY,
+            fontSize=10.1,
+            leading=14.9,
             alignment=TA_LEFT,
-            spaceAfter=5,
+            spaceAfter=6,
         ),
         "body_indent": ParagraphStyle(
             "BodyIndent",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=9.2,
-            leading=13.2,
+            fontName=FONT_BODY,
+            fontSize=9.9,
+            leading=14.2,
             leftIndent=14,
             firstLineIndent=-14,
-            spaceAfter=4,
+            spaceAfter=4.5,
         ),
         "small": ParagraphStyle(
             "Small",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=8.2,
-            leading=11,
+            fontName=FONT_BODY,
+            fontSize=8.8,
+            leading=11.7,
             spaceAfter=4,
         ),
         "caption": ParagraphStyle(
             "Caption",
             parent=base["BodyText"],
-            fontName="Helvetica-Oblique",
-            fontSize=8,
-            leading=10,
+            fontName=FONT_BODY_ITALIC,
+            fontSize=8.6,
+            leading=11,
             textColor=colors.HexColor("#444444"),
             spaceBefore=3,
             spaceAfter=8,
@@ -112,23 +136,23 @@ def make_styles():
         "toc": ParagraphStyle(
             "TOC",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=10.5,
-            leading=17,
+            fontName=FONT_BODY,
+            fontSize=11,
+            leading=17.5,
             leftIndent=0,
             spaceAfter=5,
         ),
         "callout": ParagraphStyle(
             "Callout",
             parent=base["BodyText"],
-            fontName="Helvetica",
-            fontSize=9,
-            leading=12.5,
+            fontName=FONT_BODY,
+            fontSize=9.8,
+            leading=14,
             textColor=colors.black,
             leftIndent=10,
             rightIndent=10,
-            borderColor=colors.HexColor("#777777"),
-            borderWidth=0.4,
+            borderColor=colors.HexColor("#aaaaaa"),
+            borderWidth=0.25,
             borderPadding=7,
             spaceBefore=5,
             spaceAfter=8,
@@ -138,7 +162,7 @@ def make_styles():
 
 def footer(canvas, doc):
     canvas.saveState()
-    canvas.setFont("Helvetica", 8)
+    canvas.setFont(FONT_BODY, 8)
     canvas.setFillColor(colors.HexColor("#555555"))
     page = canvas.getPageNumber()
     canvas.drawRightString(A4[0] - 1.55 * cm, 1.0 * cm, f"Page {page}")
@@ -158,6 +182,7 @@ def bullets(items, styles):
     return ListFlowable(
         [ListItem(p(item, styles["body"]), leftIndent=10) for item in items],
         bulletType="bullet",
+        bulletFontName=FONT_BODY,
         leftIndent=14,
         bulletFontSize=7,
     )
@@ -196,11 +221,12 @@ def data_table(rows, col_widths):
             [
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("FONTSIZE", (0, 0), (-1, -1), 7.7),
-                ("LEADING", (0, 0), (-1, -1), 9.7),
-                ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#999999")),
+                ("FONTNAME", (0, 0), (-1, 0), FONT_BODY_BOLD),
+                ("FONTNAME", (0, 1), (-1, -1), FONT_BODY),
+                ("FONTSIZE", (0, 0), (-1, -1), 8.6),
+                ("LEADING", (0, 0), (-1, -1), 11),
+                ("BOX", (0, 0), (-1, -1), 0.25, colors.HexColor("#999999")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.18, colors.HexColor("#c8c8c8")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 5),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 5),
@@ -221,9 +247,10 @@ def text_table(rows, col_widths, styles):
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#999999")),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),
+                ("FONTNAME", (0, 0), (-1, 0), FONT_BODY_BOLD),
+                ("BOX", (0, 0), (-1, -1), 0.25, colors.HexColor("#999999")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.18, colors.HexColor("#cccccc")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 5),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 5),
@@ -237,7 +264,7 @@ def text_table(rows, col_widths, styles):
 
 def rule():
     table = Table([[""]], colWidths=[16.4 * cm], rowHeights=[0.04 * cm])
-    table.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#444444"))]))
+    table.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#999999"))]))
     return table
 
 
@@ -276,10 +303,10 @@ def build_body():
     doc = SimpleDocTemplate(
         str(BODY_PDF),
         pagesize=A4,
-        rightMargin=1.55 * cm,
-        leftMargin=1.55 * cm,
-        topMargin=1.35 * cm,
-        bottomMargin=1.35 * cm,
+        rightMargin=1.8 * cm,
+        leftMargin=1.8 * cm,
+        topMargin=1.55 * cm,
+        bottomMargin=1.55 * cm,
     )
 
     story = []
