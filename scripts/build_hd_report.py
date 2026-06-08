@@ -60,8 +60,8 @@ def make_styles():
             "TitleCustom",
             parent=base["Title"],
             fontName=FONT_BODY_BOLD,
-            fontSize=28,
-            leading=34,
+            fontSize=27,
+            leading=33,
             alignment=TA_LEFT,
             textColor=colors.black,
             spaceAfter=18,
@@ -85,22 +85,12 @@ def make_styles():
             textColor=colors.HexColor("#333333"),
             spaceAfter=8,
         ),
-        "cover_note": ParagraphStyle(
-            "CoverNote",
-            parent=base["Normal"],
-            fontName=FONT_BODY_ITALIC,
-            fontSize=10.8,
-            leading=15,
-            alignment=TA_LEFT,
-            textColor=colors.HexColor("#333333"),
-            spaceAfter=8,
-        ),
         "cover_meta": ParagraphStyle(
             "CoverMeta",
             parent=base["Normal"],
             fontName=FONT_BODY,
-            fontSize=10.5,
-            leading=14,
+            fontSize=11,
+            leading=15,
             textColor=colors.black,
             spaceAfter=0,
         ),
@@ -108,30 +98,37 @@ def make_styles():
             "TOCTitle",
             parent=base["Heading1"],
             fontName=FONT_BODY_BOLD,
-            fontSize=22,
-            leading=28,
+            fontSize=18,
+            leading=24,
             textColor=colors.black,
             spaceBefore=0,
-            spaceAfter=16,
+            spaceAfter=18,
         ),
-        "toc_main": ParagraphStyle(
-            "TOCMain",
+        "toc_num": ParagraphStyle(
+            "TOCNum",
             parent=base["BodyText"],
             fontName=FONT_BODY,
-            fontSize=11.4,
-            leading=18,
-            leftIndent=0,
-            spaceAfter=3,
+            fontSize=10.8,
+            leading=16.5,
+            spaceAfter=0,
         ),
-        "toc_sub": ParagraphStyle(
-            "TOCSub",
+        "toc_entry": ParagraphStyle(
+            "TOCEntry",
             parent=base["BodyText"],
             fontName=FONT_BODY,
-            fontSize=10.2,
-            leading=16,
-            leftIndent=16,
-            textColor=colors.HexColor("#333333"),
-            spaceAfter=2,
+            fontSize=10.8,
+            leading=16.5,
+            textColor=colors.black,
+            spaceAfter=0,
+        ),
+        "toc_page": ParagraphStyle(
+            "TOCPage",
+            parent=base["BodyText"],
+            fontName=FONT_BODY,
+            fontSize=10.8,
+            leading=16.5,
+            alignment=TA_LEFT,
+            spaceAfter=0,
         ),
         "lead": ParagraphStyle(
             "Lead",
@@ -218,20 +215,15 @@ def make_styles():
             leftIndent=0,
             spaceAfter=5,
         ),
-        "callout": ParagraphStyle(
-            "Callout",
+        "plain_note": ParagraphStyle(
+            "PlainNote",
             parent=base["BodyText"],
             fontName=FONT_BODY,
-            fontSize=9.8,
-            leading=14,
+            fontSize=10.1,
+            leading=14.9,
             textColor=colors.black,
-            leftIndent=10,
-            rightIndent=10,
-            borderColor=colors.HexColor("#aaaaaa"),
-            borderWidth=0.25,
-            borderPadding=7,
-            spaceBefore=5,
-            spaceAfter=8,
+            spaceBefore=3,
+            spaceAfter=6,
         ),
     }
 
@@ -290,30 +282,6 @@ def fds_fig(path, caption, styles, max_w=16.0 * cm, max_h=8.2 * cm):
     )
 
 
-def data_table(rows, col_widths):
-    table = Table(rows, colWidths=col_widths, hAlign="LEFT")
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
-                ("FONTNAME", (0, 0), (-1, 0), FONT_BODY_BOLD),
-                ("FONTNAME", (0, 1), (-1, -1), FONT_BODY),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.6),
-                ("LEADING", (0, 0), (-1, -1), 11),
-                ("BOX", (0, 0), (-1, -1), 0.25, colors.HexColor("#999999")),
-                ("INNERGRID", (0, 0), (-1, -1), 0.18, colors.HexColor("#c8c8c8")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
-    return table
-
-
 def cover_meta_table(rows, styles):
     table_rows = [[p(f"<b>{key}</b>", styles["cover_meta"]), p(value, styles["cover_meta"])] for key, value in rows]
     table = Table(table_rows, colWidths=[4.6 * cm, 10.7 * cm], hAlign="LEFT")
@@ -323,10 +291,8 @@ def cover_meta_table(rows, styles):
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 0),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-                ("LINEABOVE", (0, 0), (-1, 0), 0.4, colors.HexColor("#777777")),
-                ("LINEBELOW", (0, -1), (-1, -1), 0.4, colors.HexColor("#777777")),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ]
         )
     )
@@ -357,18 +323,6 @@ def text_table(rows, col_widths, styles):
     return table
 
 
-def rule():
-    table = Table([[""]], colWidths=[16.4 * cm], rowHeights=[0.04 * cm])
-    table.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#999999"))]))
-    return table
-
-
-def light_rule(width=16.4 * cm):
-    table = Table([[""]], colWidths=[width], rowHeights=[0.02 * cm])
-    table.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#cccccc"))]))
-    return table
-
-
 def finding_block(number, title, result, interpretation, styles):
     return KeepTogether(
         [
@@ -387,27 +341,28 @@ def kv_lines(items, styles):
     return flow
 
 
-def toc_line(title, page, styles):
-    return p(f"{title}<font color='#777777'> {' . ' * 20}</font>{page}", styles["toc"])
+def split_toc_title(title):
+    first = title.split()[0]
+    if first[0].isdigit():
+        return first, title[len(first):].strip()
+    return "", title
 
 
 def toc_table(items, styles):
     rows = []
     for title, page in items:
-        prefix = title.split()[0]
-        is_sub = prefix.rstrip(".").count(".") >= 1 and prefix[0].isdigit()
-        style = styles["toc_sub"] if is_sub else styles["toc_main"]
-        rows.append([p(title, style), p(page, style)])
-    table = Table(rows, colWidths=[14.7 * cm, 1.1 * cm], hAlign="LEFT")
+        number, label = split_toc_title(title)
+        rows.append([p(number, styles["toc_num"]), p(label, styles["toc_entry"]), p(page, styles["toc_page"])])
+    table = Table(rows, colWidths=[1.25 * cm, 13.0 * cm, 1.15 * cm], hAlign="LEFT")
     table.setStyle(
         TableStyle(
             [
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("ALIGN", (2, 0), (2, -1), "RIGHT"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 0),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-                ("TOPPADDING", (0, 0), (-1, -1), 2),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+                ("TOPPADDING", (0, 0), (-1, -1), 2.5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
             ]
         )
     )
@@ -431,11 +386,10 @@ def build_body():
         Spacer(1, 1.65 * cm),
         p("FIT5147 Data Exploration and Visualisation", styles["cover_kicker"]),
         p("When Sunshine Meets Rain", styles["title"]),
-        light_rule(9.6 * cm),
-        Spacer(1, 0.35 * cm),
+        Spacer(1, 0.25 * cm),
         p("Understanding Solar Radiation Patterns at King's Park, Hong Kong", styles["subtitle"]),
-        p("Data Visualisation Project - Part 2 Report", styles["cover_note"]),
-        Spacer(1, 1.25 * cm),
+        p("Data Visualisation Project - Part 2 Report", styles["subtitle"]),
+        Spacer(1, 1.45 * cm),
         cover_meta_table(
             [
                 ["Student name", "Sun Zhen"],
@@ -446,19 +400,12 @@ def build_body():
             ],
             styles,
         ),
-        Spacer(1, 1.05 * cm),
-        p(
-            "This report documents the design process, implementation, interaction design, and reflection for an interactive narrative visualisation built with D3.js. The visualisation turns daily solar radiation, rainfall, sunshine, and humidity records into a five-step story for planning-oriented interpretation.",
-            styles["cover_note"],
-        ),
         PageBreak(),
     ]
 
     story += [
         Spacer(1, 0.6 * cm),
-        p("Contents", styles["toc_title"]),
-        light_rule(16.4 * cm),
-        Spacer(1, 0.35 * cm),
+        p("Table of Contents", styles["toc_title"]),
         toc_table(
             [
                 ("1. Introduction", "3"),
@@ -515,7 +462,7 @@ def build_body():
         Spacer(1, 0.2 * cm),
         p(
             "The final implementation is designed to be readable without the report: story navigation, chart titles, legends, tooltips, an insight panel, and planning takeaways communicate the narrative inside the interface itself. The wording is deliberately evidence-aware: association is not described as causation, and the humidity hypothesis is explicitly refined rather than overstated.",
-            styles["callout"],
+            styles["plain_note"],
         ),
         PageBreak(),
     ]
@@ -554,7 +501,7 @@ def build_body():
         Spacer(1, 0.2 * cm),
         p(
             "A second change was made after the Part 1 design presentation: the original final sheet listed R Shiny as the intended implementation environment, but the final implementation uses D3.js. Direct SVG control, custom story-step state, and linked highlighting between views are more naturally implemented in D3 than in a Shiny layout based mainly on packaged chart outputs.",
-            styles["callout"],
+            styles["plain_note"],
         ),
         PageBreak(),
     ]
@@ -575,7 +522,7 @@ def build_body():
         ),
         p(
             "The linked extreme-day interaction supports Shneiderman's overview-then-details principle. Readers first see aggregate extreme-day counts and summary cards, then click an individual date to trace that record back to the full daily scatterplot context. This creates a clear connection between summary evidence and individual observations.",
-            styles["callout"],
+            styles["plain_note"],
         ),
         p(
             "The design also reflects human visual perception constraints. Temporal patterns are encoded with connected lines because continuity supports the perception of change over ordered time. Seasonal comparison uses a shared standardised scale to make peaks and troughs comparable across variables with different units. The scatterplot uses partially transparent marks to reduce overplotting, while the extreme-day highlight increases salience only when the user asks to inspect rare high-radiation records.",
@@ -745,8 +692,7 @@ def build_body():
     story += [
         p("3.3 Using the Implementation", styles["h2"]),
         p("The visualisation runs locally from the submitted code folder:", styles["body"]),
-        p("python -m http.server 8000", styles["callout"]),
-        p("Then open http://localhost:8000 in a browser.", styles["body"]),
+        p("Run <b>python -m http.server 8000</b>, then open <b>http://localhost:8000</b> in a browser.", styles["body"]),
         bullets(
             [
                 "Click the five story-step buttons to move through the narrative.",
